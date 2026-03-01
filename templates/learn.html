@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn New Input</title>
+    <style>
+        body { background-color: black; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Learn New Input</h1>
+    <form id="learn-form">
+        <label for="user-input">User Input:</label>
+        <input type="text" id="user-input" required>
+        <br>
+        <label for="correct-answer">Correct Answer:</label>
+        <input type="text" id="correct-answer" required>
+        <br>
+        <button type="submit">Learn</button>
+    </form>
+
+    <div id="response-area"></div>
+
+    <script>
+        document.getElementById('learn-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const userInput = document.getElementById('user-input').value;
+            const correctAnswer = document.getElementById('correct-answer').value;
+
+            const response = await fetch('/learn', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_input: userInput, correct_answer: correctAnswer })
+            });
+
+            const data = await response.json();
+            document.getElementById('response-area').innerText = data.status;
+            document.getElementById('learn-form').reset();
+        });
+    </script>
+</body>
+</html>

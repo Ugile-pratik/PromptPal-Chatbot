@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body { background-color: black; color: white; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; text-align: left; border: 1px solid #fff; }
+    </style>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    
+    <h2>Learned Data</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>User Input</th>
+                <th>Correct Answer</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="learned-data-table">
+            {% for input, answer in learned_data.items() %}
+                <tr>
+                    <td>{{ input }}</td>
+                    <td>
+                        <input type="text" id="answer-{{ input }}" value="{{ answer }}" />
+                    </td>
+                    <td>
+                        <button onclick="saveChanges('{{ input }}')">Save</button>
+                        <button onclick="deleteLearnedData('{{ input }}')">Delete</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Chat History</h2>
+    <div id="chat-history">
+        <ul>
+            {% for chat in chat_history %}
+                <li>{{ chat }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <button onclick="clearChatHistory()">Clear Chat History</button>
+
+    <script>
+        async function deleteLearnedData(userInput) {
+            const response = await fetch('/delete-learned-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_input: userInput })
+            });
+            const data = await response.json();
+            alert(data.status);
+            location.reload(); // Reload the page to see changes
+        }
+
+        async function clearChatHistory() {
+            const response = await fetch('/clear-chat-history', {
+                method: 'POST'
+            });
+            const data = await response.json();
+            alert(data.status);
+            location.reload(); // Reload the page to see changes
+        }
+
+        async function saveChanges(userInput) {
+            const newAnswer = document.getElementById(`answer-${userInput}`).value;
+            const response = await fetch('/modify-learned-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_input: userInput, new_answer: newAnswer })
+            });
+            const data = await response.json();
+            alert(data.status);
+            location.reload(); // Reload the page to see changes
+        }
+    </script>
+</body>
+</html>
